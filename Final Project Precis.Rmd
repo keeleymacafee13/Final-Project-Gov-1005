@@ -1,0 +1,24 @@
+---
+title: "Final Project"
+author: "Keeley MacAfee"
+date: "10/17/2018"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+library(readxl)
+library(janitor)
+```
+
+```{r}
+expenditures <- read_excel("nominal_expenditures.xlsx", skip = 4) %>%
+  clean_names()
+
+expenditures_no_taxes_tips <- read_excel("nominal_expenditures_no_taxes_tips.xlsx", skip = 4) %>%
+  clean_names()
+```
+ 
+This data set is from the USDA's current food expenditures series. I plan to run analysis on certain variables, like expenditure at grocery stores, gas stations, etc., to assess the changes in spending on food and alcohol in different capacities. I have worked with consumer trends in the context of professional athletics, and I am interested in using this data to draw conclusions about more day-to-day consumer behaviors.
+
