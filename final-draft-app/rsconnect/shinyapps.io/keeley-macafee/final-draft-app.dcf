@@ -1,0 +1,12 @@
+name: final-draft-app
+title: final-draft-app
+username:
+account: keeley-macafee
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 552146
+bundleId: 1681569
+url: https://keeley-macafee.shinyapps.io/final-draft-app/
+when: 1541369212.45246
+asMultiple: FALSE
+asStatic: FALSE
