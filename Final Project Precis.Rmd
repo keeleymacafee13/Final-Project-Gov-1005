@@ -13,11 +13,11 @@ library(janitor)
 ```
 
 ```{r}
-expenditures <- read_excel("./data/nominal_expenditures.xlsx", skip = 4) %>%
+expenditures <- read_excel("../data/nominal_expenditures.xlsx", skip = 4) %>%
   clean_names() %>%
   head(21)
 
-expenditures_no_taxes_tips <- read_excel("./data/nominal_expenditures_no_taxes_tips.xlsx", skip = 4) %>%
+expenditures_no_taxes_tips <- read_excel("../data/nominal_expenditures_no_taxes_tips.xlsx", skip = 4) %>%
   clean_names() %>%
   head(21)
 
