@@ -16,12 +16,25 @@ library(janitor)
 #Raw nominal expenditures 
 expenditures <- read_excel("nominal_expenditures.xlsx", skip = 4, n_max = 21) %>%
   clean_names()
-```
 
-```{r}
 #Raw expenditures no taxes/tips
 expenditures_no_taxes_tips <- read_excel("nominal_expenditures_no_taxes_tips.xlsx", skip = 4, n_max = 21) %>%
   clean_names()
+
+#Join food expenditure data
+exp_joined <- left_join(expenditures, expenditures_no_taxes_tips, by = "year") %>%
+  select(year, grocery_stores.x, convenience_stores.x, mass_merchandisers.x, mail_order_and_home_delivery.x, home_production_and_donations.x, full_service_restaurants.x, hotels_and_motels.x, schools_and_colleges.x, grocery_stores.y, convenience_stores.y, mass_merchandisers.y, mail_order_and_home_delivery.y, home_production_and_donations.y, full_service_restaurants.y, hotels_and_motels.y, schools_and_colleges.y)
+
+#Calculate tips for each category 
+tips_taxes_total <- exp_joined %>%
+  mutate(t_grocery = grocery_stores.x - grocery_stores.y,
+         t_conv = convenience_stores.x - convenience_stores.y,
+         t_mass = mass_merchandisers.x - mass_merchandisers.y,
+         t_mail = mail_order_and_home_delivery.x - mail_order_and_home_delivery.y,
+         t_home = home_production_and_donations.x - home_production_and_donations.y,
+         t_rest = full_service_restaurants.x - full_service_restaurants.y,
+         t_hotel = hotels_and_motels.x - hotels_and_motels.y, 
+         t_school = schools_and_colleges.x - schools_and_colleges.y)
 ```
 
 ```{r}
@@ -35,6 +48,36 @@ population <- read_excel("POPTOTUSA647NWDB.xls") %>%
   mutate(year = parse_number(year))
 ```
 
+```{r}
+#Food 
+food <- expenditures %>%
+  select(year, grocery_stores, convenience_stores, mass_merchandisers, mail_order_and_home_delivery, home_production_and_donations, full_service_restaurants, hotels_and_motels, schools_and_colleges)
+
+indiv_food <- left_join(food, population, by = "year") %>%
+  mutate(indiv_grocery = grocery_stores/pop,
+         indiv_conv = convenience_stores/pop,
+         indiv_mass = mass_merchandisers/pop,
+         indiv_mail = mail_order_and_home_delivery/pop,
+         indiv_home = home_production_and_donations/pop,
+         indiv_rest = full_service_restaurants/pop,
+         indiv_hotel = hotels_and_motels/pop, 
+         indiv_school = schools_and_colleges/pop)
+
+food_no_taxes_tips <- expenditures_no_taxes_tips %>%
+  select(year, grocery_stores, convenience_stores, mass_merchandisers, mail_order_and_home_delivery, home_production_and_donations, full_service_restaurants, hotels_and_motels, schools_and_colleges)
+
+indiv_food_no_t <- left_join(food_no_taxes_tips, population, by = "year") %>%
+  mutate(indiv_grocery = grocery_stores/pop,
+         indiv_conv = convenience_stores/pop,
+         indiv_mass = mass_merchandisers/pop,
+         indiv_mail = mail_order_and_home_delivery/pop,
+         indiv_home = home_production_and_donations/pop,
+         indiv_rest = full_service_restaurants/pop,
+         indiv_hotel = hotels_and_motels/pop, 
+         indiv_school = schools_and_colleges/pop)
+
+ggplot(indiv_food_no_t, aes(x = year, y = indiv_mass)) + geom_point() + geom_smooth()
+```
 
 ```{r}
 # Join data
@@ -42,10 +85,8 @@ exp_pop <- left_join(expenditures, population, by = "year")
 
 total_indiv <- exp_pop %>%
   mutate(indiv_fah = total_fah/pop,
-         indiv_fafh = total_fafh/pop,
-         indiv_aah = total_aah/pop, 
-         indiv_aafh = total_aafh/pop) %>%
-  select(total_fah, total_fafh, total_aah, total_aafh, indiv_fah, indiv_fafh, indiv_aah, indiv_aafh)
+         indiv_fafh = total_fafh/pop) %>%
+  select(year, indiv_fah, indiv_fafh)
 
 ```
 
@@ -63,8 +104,15 @@ ggplot(conv, aes(x = year, y = convenience_stores)) + geom_point()
 write_rds(expenditures, path = "final-app/expenditures.rds")
 
 write_rds(expenditures_no_taxes_tips, path = "final-app/expenditures_no_taxes_tips.rds")
+
+write_rds(total_indiv, path = "final-app/total_indiv.rds")
+
+write_rds(food, path = "final-app/food.rds")
 ```
 
 
+```{r}
+# Plot 1 is raw nominal expenditures on certain food places. 
+```
 
 
