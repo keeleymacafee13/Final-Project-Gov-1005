@@ -21,11 +21,20 @@ expenditures <- read_excel("nominal_expenditures.xlsx", skip = 4, n_max = 21) %>
 expenditures_no_taxes_tips <- read_excel("nominal_expenditures_no_taxes_tips.xlsx", skip = 4, n_max = 21) %>%
   clean_names()
 
+#Yearly population data
+population <- read_excel("POPTOTUSA647NWDB.xls") %>%
+  slice(38:58) %>%
+  mutate(neat = str_split(observation_date, "-")) %>%
+  separate(neat, into = c("c", "year", "date1", "date2")) %>%
+  select(year, POPTOTUSA647NWDB) %>%
+  transmute(year = year, pop = POPTOTUSA647NWDB) %>%
+  mutate(year = parse_number(year))
+
 #Join food expenditure data
 exp_joined <- left_join(expenditures, expenditures_no_taxes_tips, by = "year") %>%
   select(year, grocery_stores.x, convenience_stores.x, mass_merchandisers.x, mail_order_and_home_delivery.x, home_production_and_donations.x, full_service_restaurants.x, hotels_and_motels.x, schools_and_colleges.x, grocery_stores.y, convenience_stores.y, mass_merchandisers.y, mail_order_and_home_delivery.y, home_production_and_donations.y, full_service_restaurants.y, hotels_and_motels.y, schools_and_colleges.y)
 
-#Calculate tips for each category 
+#Calculate tips/taxes each category 
 tips_taxes_total <- exp_joined %>%
   mutate(t_grocery = grocery_stores.x - grocery_stores.y,
          t_conv = convenience_stores.x - convenience_stores.y,
@@ -35,18 +44,24 @@ tips_taxes_total <- exp_joined %>%
          t_rest = full_service_restaurants.x - full_service_restaurants.y,
          t_hotel = hotels_and_motels.x - hotels_and_motels.y, 
          t_school = schools_and_colleges.x - schools_and_colleges.y)
+
+#Calculate tips/taxes for individuals
+indiv_tips_taxes <- left_join(tips_taxes_total, population, by = "year") %>%
+  mutate(indiv_t_grocery = (t_grocery/pop) * 1000000,
+         indiv_t_conv = (t_conv/pop) * 1000000,
+         indiv_t_mass = (t_mass/pop) * 1000000,
+         indiv_t_mail = (t_mail/pop) * 1000000,
+         indiv_t_home = t_home/pop,
+         indiv_t_rest = (t_rest/pop) * 1000000,
+         indiv_t_hotel = (t_hotel/pop) * 1000000,
+         indiv_t_school = t_school/pop) %>%
+  select(year, indiv_t_grocery, indiv_t_conv, indiv_t_mass, indiv_t_mail, indiv_t_home, indiv_t_rest, indiv_t_hotel, indiv_t_school)
+
+ggplot(indiv_tips_taxes, aes(x = year, y = indiv_t_mail)) + geom_point() + geom_smooth()
+
 ```
 
-```{r}
-#Yearly population data
-population <- read_excel("POPTOTUSA647NWDB.xls") %>%
-  slice(38:58) %>%
-  mutate(neat = str_split(observation_date, "-")) %>%
-  separate(neat, into = c("c", "year", "date1", "date2")) %>%
-  select(year, POPTOTUSA647NWDB) %>%
-  transmute(year = year, pop = POPTOTUSA647NWDB) %>%
-  mutate(year = parse_number(year))
-```
+
 
 ```{r}
 #Food 
@@ -108,6 +123,8 @@ write_rds(expenditures_no_taxes_tips, path = "final-app/expenditures_no_taxes_ti
 write_rds(total_indiv, path = "final-app/total_indiv.rds")
 
 write_rds(food, path = "final-app/food.rds")
+
+write_rds(indiv_tips_taxes, path = "final-app/indiv_tips_taxes.rds")
 ```
 
 
