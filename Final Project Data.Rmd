@@ -1,0 +1,70 @@
+---
+title: "Final Project Data"
+author: "Keeley MacAfee"
+date: "11/26/2018"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+library(readxl)
+library(janitor)
+```
+
+```{r}
+#Raw nominal expenditures 
+expenditures <- read_excel("nominal_expenditures.xlsx", skip = 4, n_max = 21) %>%
+  clean_names()
+```
+
+```{r}
+#Raw expenditures no taxes/tips
+expenditures_no_taxes_tips <- read_excel("nominal_expenditures_no_taxes_tips.xlsx", skip = 4, n_max = 21) %>%
+  clean_names()
+```
+
+```{r}
+#Yearly population data
+population <- read_excel("POPTOTUSA647NWDB.xls") %>%
+  slice(38:58) %>%
+  mutate(neat = str_split(observation_date, "-")) %>%
+  separate(neat, into = c("c", "year", "date1", "date2")) %>%
+  select(year, POPTOTUSA647NWDB) %>%
+  transmute(year = year, pop = POPTOTUSA647NWDB) %>%
+  mutate(year = parse_number(year))
+```
+
+
+```{r}
+# Join data
+exp_pop <- left_join(expenditures, population, by = "year")
+
+total_indiv <- exp_pop %>%
+  mutate(indiv_fah = total_fah/pop,
+         indiv_fafh = total_fafh/pop,
+         indiv_aah = total_aah/pop, 
+         indiv_aafh = total_aafh/pop) %>%
+  select(total_fah, total_fafh, total_aah, total_aafh, indiv_fah, indiv_fafh, indiv_aah, indiv_aafh)
+
+```
+
+
+```{r}
+#Example plot
+conv <- expenditures %>%
+  select(year, convenience_stores)
+
+ggplot(conv, aes(x = year, y = convenience_stores)) + geom_point()
+```
+
+
+```{r}
+write_rds(expenditures, path = "final-app/expenditures.rds")
+
+write_rds(expenditures_no_taxes_tips, path = "final-app/expenditures_no_taxes_tips.rds")
+```
+
+
+
+
