@@ -1,11 +1,4 @@
-#
-# This is a Shiny web application. You can run the application by clicking
-# the 'Run App' button above.
-#
-# Find out more about building applications with Shiny here:
-#
-#    http://shiny.rstudio.com/
-#
+
 
 library(shiny)
 library(tidyverse)
@@ -15,6 +8,7 @@ exp_no_taxes_tips <- read_rds("expenditures_no_taxes_tips.rds")
 tot_indiv <- read_rds("total_indiv.rds")
 food <- read_rds("food.rds")
 indiv_tips_taxes <- read_rds("indiv_tips_taxes.rds")
+indiv_food1 <- read_rds("indiv_food.rds")
 
 
 # Define UI for application that draws a histogram
@@ -29,7 +23,14 @@ ui <- fluidPage(
                                          "Mail Order and Home Delivery","Home Production and Donations",
                                          "Full Service Restaurants",
                                          "Hotels and Motels", 
-                                         "Schools and Colleges"))
+                                         "Schools and Colleges")),
+                 selectInput(inputId = "z",
+                              label = "Select Location:", 
+                              choices = c("Grocery Stores", "Convenience Stores", "Mass Merchandisers", 
+                                          "Mail Order and Home Delivery","Home Production and Donations",
+                                          "Full Service Restaurants",
+                                          "Hotels and Motels", 
+                                          "Schools and Colleges"))
   
     ) ,
     
@@ -50,25 +51,38 @@ ui <- fluidPage(
 
 # Define server logic required to draw a histogram
 server <- function(input, output) {
-  
-  output$Plot1 <- renderPlot({
-    ggplot(food, aes(x = year,  y = switch(input$y,
-                                                   "Grocery Stores" = grocery_stores, 
-                                                   "Convenience Stores" = convenience_stores,
-                                                   "Mass Merchandisers" = mass_merchandisers, 
-                                                   "Mail Order and Home Delivery" = mail_order_and_home_delivery,
-                                                   "Home Production and Donations" = home_production_and_donations,
-                                                   "Full Service Restaurants" = full_service_restaurants,
-                                                   "Hotels and Motels" = hotels_and_motels,
-                                                   "Schools and Colleges" = schools_and_colleges))) + geom_point() +
-      geom_smooth() +
-      ggtitle("APP TITLE") +
-      xlab("Year") +
-      ylab("Places")
-  })
 
-  output$Plot2 <- renderPlot({
+  output$Plot1 <- renderPlot({
     
+    
+      ggplot(indiv_food1, aes(x = year,  y = switch(input$y,
+                                                   "Grocery Stores" = indiv_grocery, 
+                                                   "Convenience Stores" = indiv_conv,
+                                                   "Mass Merchandisers" = indiv_mass, 
+                                                   "Mail Order and Home Delivery" = indiv_mail,
+                                                   "Home Production and Donations" = indiv_home,
+                                                   "Full Service Restaurants" = indiv_rest,
+                                                   "Hotels and Motels" = indiv_hotel,
+                                                   "Schools and Colleges" = indiv_school), color = input$y)) + geom_point() +
+        geom_smooth() +
+        geom_smooth(aes(y = switch(input$z,
+                                   "Grocery Stores" = indiv_grocery, 
+                                   "Convenience Stores" = indiv_conv,
+                                   "Mass Merchandisers" = indiv_mass, 
+                                   "Mail Order and Home Delivery" = indiv_mail,
+                                   "Home Production and Donations" = indiv_home,
+                                   "Full Service Restaurants" = indiv_rest,
+                                   "Hotels and Motels" = indiv_hotel,
+                                   "Schools and Colleges" = indiv_school), color = input$z)) +
+        ggtitle("Average Expenditure on Food Per Individual in the U.S.") +
+        xlab("Year") +
+        ylab("Expenditures (in Dollars)")})
+    
+   
+    
+
+    
+  output$Plot2 <- renderPlot({ 
     ggplot(indiv_tips_taxes, aes(x = year, y = switch(input$y,
                                                       "Grocery Stores" = indiv_t_grocery, 
                                                       "Convenience Stores" = indiv_t_conv,
@@ -77,13 +91,23 @@ server <- function(input, output) {
                                                       "Home Production and Donations" = indiv_t_home,
                                                       "Full Service Restaurants" = indiv_t_rest,
                                                       "Hotels and Motels" = indiv_t_hotel,
-                                                      "Schools and Colleges" = indiv_t_school))) + geom_point() +
+                                                      "Schools and Colleges" = indiv_t_school), color = input$y)) + geom_point() +
       geom_smooth() +
-      ggtitle("APP TITLE") +
+      geom_smooth(aes(y = switch(input$z,
+                                 "Grocery Stores" = indiv_t_grocery, 
+                                 "Convenience Stores" = indiv_t_conv,
+                                 "Mass Merchandisers" = indiv_t_mass, 
+                                 "Mail Order and Home Delivery" = indiv_t_mail,
+                                 "Home Production and Donations" = indiv_t_home,
+                                 "Full Service Restaurants" = indiv_t_rest,
+                                 "Hotels and Motels" = indiv_t_hotel,
+                                 "Schools and Colleges" = indiv_t_school), color = input$z)) +
+      ggtitle("Tax and Tips Per Individual in the U.S.") +
       xlab("Year") +
-      ylab("Places")
-    
+      ylab("Tip and Tax Amount (in Dollars)")
+      
   })
+  
   
   
 }

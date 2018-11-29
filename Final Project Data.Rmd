@@ -69,14 +69,15 @@ food <- expenditures %>%
   select(year, grocery_stores, convenience_stores, mass_merchandisers, mail_order_and_home_delivery, home_production_and_donations, full_service_restaurants, hotels_and_motels, schools_and_colleges)
 
 indiv_food <- left_join(food, population, by = "year") %>%
-  mutate(indiv_grocery = grocery_stores/pop,
-         indiv_conv = convenience_stores/pop,
-         indiv_mass = mass_merchandisers/pop,
-         indiv_mail = mail_order_and_home_delivery/pop,
-         indiv_home = home_production_and_donations/pop,
-         indiv_rest = full_service_restaurants/pop,
-         indiv_hotel = hotels_and_motels/pop, 
-         indiv_school = schools_and_colleges/pop)
+  mutate(indiv_grocery = (grocery_stores/pop) * 1000000,
+         indiv_conv = (convenience_stores/pop) * 1000000,
+         indiv_mass = (mass_merchandisers/pop) * 1000000,
+         indiv_mail = (mail_order_and_home_delivery/pop) * 1000000,
+         indiv_home = (home_production_and_donations/pop) * 1000000,
+         indiv_rest = (full_service_restaurants/pop) * 1000000,
+         indiv_hotel = (hotels_and_motels/pop) * 1000000, 
+         indiv_school = (schools_and_colleges/pop) * 1000000) %>%
+  select(year, indiv_grocery, indiv_conv, indiv_mass, indiv_mail, indiv_home, indiv_rest, indiv_hotel, indiv_school)
 
 food_no_taxes_tips <- expenditures_no_taxes_tips %>%
   select(year, grocery_stores, convenience_stores, mass_merchandisers, mail_order_and_home_delivery, home_production_and_donations, full_service_restaurants, hotels_and_motels, schools_and_colleges)
@@ -125,6 +126,8 @@ write_rds(total_indiv, path = "final-app/total_indiv.rds")
 write_rds(food, path = "final-app/food.rds")
 
 write_rds(indiv_tips_taxes, path = "final-app/indiv_tips_taxes.rds")
+
+write_rds(indiv_food, path = "final-app/indiv_food.rds")
 ```
 
 
