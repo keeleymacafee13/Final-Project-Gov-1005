@@ -51,6 +51,8 @@ ui <- fluidPage(
 
 # Define server logic required to draw a histogram
 server <- function(input, output) {
+  
+  
 
   output$Plot1 <- renderPlot({
     
@@ -63,7 +65,8 @@ server <- function(input, output) {
                                                    "Home Production and Donations" = indiv_home,
                                                    "Full Service Restaurants" = indiv_rest,
                                                    "Hotels and Motels" = indiv_hotel,
-                                                   "Schools and Colleges" = indiv_school), color = input$y)) + geom_point() +
+                                                   "Schools and Colleges" = indiv_school), color = input$y)) +
+        geom_point() +
         geom_smooth() +
         geom_smooth(aes(y = switch(input$z,
                                    "Grocery Stores" = indiv_grocery, 

@@ -12,6 +12,7 @@ library(readxl)
 library(janitor)
 ```
 
+
 ```{r}
 #Raw nominal expenditures 
 expenditures <- read_excel("nominal_expenditures.xlsx", skip = 4, n_max = 21) %>%
@@ -95,24 +96,18 @@ indiv_food_no_t <- left_join(food_no_taxes_tips, population, by = "year") %>%
 ggplot(indiv_food_no_t, aes(x = year, y = indiv_mass)) + geom_point() + geom_smooth()
 ```
 
+
 ```{r}
 # Join data
 exp_pop <- left_join(expenditures, population, by = "year")
 
 total_indiv <- exp_pop %>%
-  mutate(indiv_fah = total_fah/pop,
-         indiv_fafh = total_fafh/pop) %>%
-  select(year, indiv_fah, indiv_fafh)
+  mutate(indiv_fah = (total_fah/pop) * 1000000,
+         indiv_fafh = (total_fafh/pop) * 1000000,
+         total = indiv_fafh + indiv_fah) %>%
+  select(year, indiv_fah, indiv_fafh, total)
 
-```
-
-
-```{r}
-#Example plot
-conv <- expenditures %>%
-  select(year, convenience_stores)
-
-ggplot(conv, aes(x = year, y = convenience_stores)) + geom_point()
+ggplot(total_indiv, aes(x = year, y = total)) + geom_point()
 ```
 
 
@@ -129,10 +124,4 @@ write_rds(indiv_tips_taxes, path = "final-app/indiv_tips_taxes.rds")
 
 write_rds(indiv_food, path = "final-app/indiv_food.rds")
 ```
-
-
-```{r}
-# Plot 1 is raw nominal expenditures on certain food places. 
-```
-
 
