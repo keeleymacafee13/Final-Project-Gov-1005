@@ -23,14 +23,16 @@ ui <- fluidPage(
                                          "Mail Order and Home Delivery","Home Production and Donations",
                                          "Full Service Restaurants",
                                          "Hotels and Motels", 
-                                         "Schools and Colleges")),
+                                         "Schools and Colleges"),
+                             selected = "Mass Merchandisers"),
                  selectInput(inputId = "z",
                               label = "Select Location:", 
                               choices = c("Grocery Stores", "Convenience Stores", "Mass Merchandisers", 
                                           "Mail Order and Home Delivery","Home Production and Donations",
                                           "Full Service Restaurants",
                                           "Hotels and Motels", 
-                                          "Schools and Colleges"))
+                                          "Schools and Colleges"),
+                             selected = "Mail Order and Home Delivery")
   
     ) ,
     

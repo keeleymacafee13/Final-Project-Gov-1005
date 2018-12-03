@@ -104,10 +104,13 @@ exp_pop <- left_join(expenditures, population, by = "year")
 total_indiv <- exp_pop %>%
   mutate(indiv_fah = (total_fah/pop) * 1000000,
          indiv_fafh = (total_fafh/pop) * 1000000,
-         total = indiv_fafh + indiv_fah) %>%
-  select(year, indiv_fah, indiv_fafh, total)
+         total_food = indiv_fafh + indiv_fah,
+         indiv_aah = (total_aah/pop) * 1000000,
+         indiv_aafh = (total_aafh/pop) * 1000000,
+         total_alcohol = indiv_aah + indiv_aafh) %>%
+  select(year, indiv_fah, indiv_fafh, total_food, indiv_aah, indiv_aafh, total_alcohol)
 
-ggplot(total_indiv, aes(x = year, y = total)) + geom_point()
+ggplot(total_indiv, aes(x = year, y = indiv_fafh)) + geom_point()
 ```
 
 
