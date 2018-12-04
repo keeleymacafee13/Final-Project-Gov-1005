@@ -111,15 +111,25 @@ availability <- left_join(r, sweet, by = "year") %>%
          indiv_meat = indiv_retail)
 
 indiv_availability <- availability %>%
-  select(year, retail_chicken, milk_cream, butter, total_cheese, total_frozen_dairy, total_canned_dairy, total_dry, indiv_fresh_frozen_fish, indiv_canned_fish, indiv_cured, indiv_fish_shell, fresh_fruit, processed_fruit, fresh_veg, processed_veg, total_wheat_flour, oat, snack_peanuts, peanut_butter, peanut_candy, total_peanuts, indiv_meat, total_sweeteners)
+  select(year, retail_chicken, milk_cream, butter, total_cheese, total_frozen_dairy, total_canned_dairy, total_dry, indiv_fresh_frozen_fish, indiv_canned_fish, indiv_cured, indiv_fish_shell, fresh_fruit, processed_fruit, fresh_veg, processed_veg, total_wheat_flour, oat, rice, total_peanuts, indiv_meat, total_sweeteners, total_flour) %>%
+  mutate(perishable = milk_cream + butter + total_cheese + fresh_fruit + fresh_veg + indiv_fish_shell + total_wheat_flour) %>%
+  mutate(imperishable = total_frozen_dairy + total_canned_dairy + total_dry + indiv_fresh_frozen_fish + indiv_canned_fish + indiv_cured + processed_fruit + processed_veg + total_sweeteners + total_flour)
 
-indiv_availability[is.na(indiv_availability)] <- 0
+perishable <- indiv_availability %>%
+  select(year, perishable) %>%
+  mutate(category = "perishable",
+         total = perishable) %>%
+  select(year, category, total)
 
-grouped <- indiv_availability %>%
-  mutate(perishable = retail_chicken + milk_cream + butter + total_cheese + fresh_fruit + fresh_veg + indiv_fish_shell + total_wheat_flour + oat + snack_peanuts + peanut_butter + peanut_candy + total_peanuts + indiv_meat) %>%
-  mutate(imperishable = total_frozen_dairy + total_canned_dairy + total_dry + indiv_fresh_frozen_fish + indiv_canned_fish + indiv_cured + processed_fruit + processed_veg + total_sweeteners)
+imperishable <- indiv_availability %>%
+  select(year, imperishable) %>%
+  mutate(category = "imperishable",
+         total = imperishable) %>%
+  select(year, category, total)
+
+availability_types <- bind_rows(perishable, imperishable)
+
 ```
-
 
 
 ```{r}
@@ -185,6 +195,7 @@ write_rds(indiv_tips_taxes, path = "final-app/indiv_tips_taxes.rds")
 write_rds(indiv_food, path = "final-app/indiv_food.rds")
 ```
 
+
 ```{r}
 write_rds(expenditures, path = "final-app-barplot/expenditures.rds")
 
@@ -197,5 +208,12 @@ write_rds(food, path = "final-app-barplot/food.rds")
 write_rds(indiv_tips_taxes, path = "final-app-barplot/indiv_tips_taxes.rds")
 
 write_rds(indiv_food, path = "final-app-barplot/indiv_food.rds")
+```
+
+
+```{r}
+write_rds(indiv_availability, path = "final-app/indiv_availability.rds")
+
+write_rds(availability_types, path = "final-app/availability_types.rds")
 ```
 

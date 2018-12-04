@@ -9,13 +9,15 @@ tot_indiv <- read_rds("total_indiv.rds")
 food <- read_rds("food.rds")
 indiv_tips_taxes <- read_rds("indiv_tips_taxes.rds")
 indiv_food1 <- read_rds("indiv_food.rds")
+total_indiv <- read_rds("total_indiv.rds")
+indiv_availability <- read_rds("indiv_availability.rds")
+availability_types <- read_rds("availability_types.rds")
 
 
 # Define UI for application that draws a histogram
 ui <- fluidPage(
   tabsetPanel(
     tabPanel("Choices", fluid = TRUE,
-             sidebarLayout(
                sidebarPanel(
                  selectInput(inputId = "y", 
                              label = "Select Location:", 
@@ -32,8 +34,7 @@ ui <- fluidPage(
                                           "Full Service Restaurants",
                                           "Hotels and Motels", 
                                           "Schools and Colleges"),
-                             selected = "Mail Order and Home Delivery")
-  
+                             selected = "Mail Order and Home Delivery"))
     ) ,
     
     
@@ -41,12 +42,13 @@ ui <- fluidPage(
       tabsetPanel(type = "tabs",
                   tabPanel("About", htmlOutput("about")),
                   tabPanel("Plot 1", plotOutput("Plot1")),
-                  tabPanel("Plot 2", plotOutput("Plot2")))
+                  tabPanel("Plot 2", plotOutput("Plot2")),
+                  tabPanel("Plot 3", plotOutput("Plot3")))
     )
   )
     )
-  )
-)
+  
+
 
 
 
@@ -67,7 +69,7 @@ server <- function(input, output) {
                                                    "Home Production and Donations" = indiv_home,
                                                    "Full Service Restaurants" = indiv_rest,
                                                    "Hotels and Motels" = indiv_hotel,
-                                                   "Schools and Colleges" = indiv_school), color = input$y)) +
+                                                   "Schools and Colleges" = indiv_school), color = "red")) +
         geom_point() +
         geom_smooth() +
         geom_smooth(aes(y = switch(input$z,
@@ -78,7 +80,7 @@ server <- function(input, output) {
                                    "Home Production and Donations" = indiv_home,
                                    "Full Service Restaurants" = indiv_rest,
                                    "Hotels and Motels" = indiv_hotel,
-                                   "Schools and Colleges" = indiv_school), color = input$z)) +
+                                   "Schools and Colleges" = indiv_school), color = "blue")) +
         ggtitle("Average Expenditure on Food Per Individual in the U.S.") +
         xlab("Year") +
         ylab("Expenditures (in Dollars)")})
@@ -96,8 +98,8 @@ server <- function(input, output) {
                                                       "Home Production and Donations" = indiv_t_home,
                                                       "Full Service Restaurants" = indiv_t_rest,
                                                       "Hotels and Motels" = indiv_t_hotel,
-                                                      "Schools and Colleges" = indiv_t_school), color = input$y)) + geom_point() +
-      geom_smooth() +
+                                                      "Schools and Colleges" = indiv_t_school), color = "red")) + geom_point() +
+      geom_smooth()  + 
       geom_smooth(aes(y = switch(input$z,
                                  "Grocery Stores" = indiv_t_grocery, 
                                  "Convenience Stores" = indiv_t_conv,
@@ -106,14 +108,20 @@ server <- function(input, output) {
                                  "Home Production and Donations" = indiv_t_home,
                                  "Full Service Restaurants" = indiv_t_rest,
                                  "Hotels and Motels" = indiv_t_hotel,
-                                 "Schools and Colleges" = indiv_t_school), color = input$z)) +
+                                 "Schools and Colleges" = indiv_t_school), color = "blue")) +
       ggtitle("Tax and Tips Per Individual in the U.S.") +
       xlab("Year") +
       ylab("Tip and Tax Amount (in Dollars)")
       
   })
-  
-  
+
+  output$Plot3 <- renderPlot({
+    
+    ggplot(availability_types, aes(x = year, y = total, color = category)) + geom_point() + geom_smooth()
+    
+    
+  })
+
   
 }
 
