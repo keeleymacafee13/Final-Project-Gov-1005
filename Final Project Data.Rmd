@@ -75,7 +75,11 @@ fruitveg <- read_excel("fruitveg.xlsx")
 
 grain <- read_excel("grain.xlsx")
 
-nuts <- read_excel("nuts.xlsx")
+nuts <- read_excel("nuts.xlsx") %>%
+  mutate(snack_peanuts = parse_number(snack_peanuts)) %>%
+  mutate(peanut_butter = parse_number(peanut_butter)) %>%
+  mutate(peanut_candy = parse_number(peanut_candy)) %>%
+  mutate(total = parse_number(total))
 
 sweet <- read_excel("sweeteners.xlsx")
 
@@ -108,6 +112,12 @@ availability <- left_join(r, sweet, by = "year") %>%
 
 indiv_availability <- availability %>%
   select(year, retail_chicken, milk_cream, butter, total_cheese, total_frozen_dairy, total_canned_dairy, total_dry, indiv_fresh_frozen_fish, indiv_canned_fish, indiv_cured, indiv_fish_shell, fresh_fruit, processed_fruit, fresh_veg, processed_veg, total_wheat_flour, oat, snack_peanuts, peanut_butter, peanut_candy, total_peanuts, indiv_meat, total_sweeteners)
+
+indiv_availability[is.na(indiv_availability)] <- 0
+
+grouped <- indiv_availability %>%
+  mutate(perishable = retail_chicken + milk_cream + butter + total_cheese + fresh_fruit + fresh_veg + indiv_fish_shell + total_wheat_flour + oat + snack_peanuts + peanut_butter + peanut_candy + total_peanuts + indiv_meat) %>%
+  mutate(imperishable = total_frozen_dairy + total_canned_dairy + total_dry + indiv_fresh_frozen_fish + indiv_canned_fish + indiv_cured + processed_fruit + processed_veg + total_sweeteners)
 ```
 
 
@@ -140,6 +150,8 @@ indiv_food_no_t <- left_join(food_no_taxes_tips, population, by = "year") %>%
          indiv_rest = full_service_restaurants/pop,
          indiv_hotel = hotels_and_motels/pop, 
          indiv_school = schools_and_colleges/pop)
+
+
 ```
 
 
