@@ -59,8 +59,8 @@ server <- function(input, output) {
     "The first tab statically displays food availability in pounds per capita over time. 
     I divided the variables into perishable and imperishable to aid visualization.
     
-    In the second tab, use the drop-down menu to select a food retailing location and visualize
-    American expenditure patterns at the selected location."
+    In the second tab, use the drop-down menu to select a U.S. food retailing location and visualize
+    expenditure patterns at the selected location."
   })
   
   
