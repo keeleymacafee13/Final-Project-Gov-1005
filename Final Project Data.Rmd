@@ -14,15 +14,25 @@ library(janitor)
 
 
 ```{r}
-#Raw nominal expenditures 
+# I decided to do my data cleaning in an R markdown instead of an R script because it helps me to visually organize each of my data frames, joins, etc. 
+
+# This chunk of data gathering/cleaning is dedicated to food expenditures. 
+
+# USDA data on total nominal food and alcohol expenditures by purchasing location in the U.S from: 
+# https://www.ers.usda.gov/data-products/food-expenditure-series/ . 
+
 expenditures <- read_excel("nominal_expenditures.xlsx", skip = 4, n_max = 21) %>%
   clean_names()
 
-#Raw expenditures no taxes/tips
-expenditures_no_taxes_tips <- read_excel("nominal_expenditures_no_taxes_tips.xlsx", skip = 4, n_max = 21) %>%
-  clean_names()
+# I wanted to focus solely on food expenditures, so I selected retail locations that either: 1. I was interested in or 2. showed/shows an interesting trend.  
 
-#Yearly population data
+food <- expenditures %>%
+  select(year, grocery_stores, convenience_stores, mass_merchandisers, mail_order_and_home_delivery, home_production_and_donations, full_service_restaurants, hotels_and_motels, schools_and_colleges)
+
+# I wanted to use expenditures per capita, rather than total expenditures, so I could compare it to my data on food availability. 
+# Yearly population data from: 
+# https://fred.stlouisfed.org/series/POPTOTUSA647NWDB . 
+
 population <- read_excel("POPTOTUSA647NWDB.xls") %>%
   slice(38:58) %>%
   mutate(neat = str_split(observation_date, "-")) %>%
@@ -31,41 +41,31 @@ population <- read_excel("POPTOTUSA647NWDB.xls") %>%
   transmute(year = year, pop = POPTOTUSA647NWDB) %>%
   mutate(year = parse_number(year))
 
-#Join food expenditure data
-exp_joined <- left_join(expenditures, expenditures_no_taxes_tips, by = "year") %>%
-  select(year, grocery_stores.x, convenience_stores.x, mass_merchandisers.x, mail_order_and_home_delivery.x, home_production_and_donations.x, full_service_restaurants.x, hotels_and_motels.x, schools_and_colleges.x, grocery_stores.y, convenience_stores.y, mass_merchandisers.y, mail_order_and_home_delivery.y, home_production_and_donations.y, full_service_restaurants.y, hotels_and_motels.y, schools_and_colleges.y)
+# Joining the food expenditure data with tthe population data allowed me to isolated the variables I care about and make them into per capita expenditures.
 
-#Calculate tips/taxes each category 
-tips_taxes_total <- exp_joined %>%
-  mutate(t_grocery = grocery_stores.x - grocery_stores.y,
-         t_conv = convenience_stores.x - convenience_stores.y,
-         t_mass = mass_merchandisers.x - mass_merchandisers.y,
-         t_mail = mail_order_and_home_delivery.x - mail_order_and_home_delivery.y,
-         t_home = home_production_and_donations.x - home_production_and_donations.y,
-         t_rest = full_service_restaurants.x - full_service_restaurants.y,
-         t_hotel = hotels_and_motels.x - hotels_and_motels.y, 
-         t_school = schools_and_colleges.x - schools_and_colleges.y)
+# I multiplied each by 10000000 because the total expenditures is in millions of dollars, but I wanted it to be in dollars per person. 
 
-#Calculate tips/taxes for individuals
-indiv_tips_taxes <- left_join(tips_taxes_total, population, by = "year") %>%
-  mutate(indiv_t_grocery = (t_grocery/pop) * 1000000,
-         indiv_t_conv = (t_conv/pop) * 1000000,
-         indiv_t_mass = (t_mass/pop) * 1000000,
-         indiv_t_mail = (t_mail/pop) * 1000000,
-         indiv_t_home = t_home/pop,
-         indiv_t_rest = (t_rest/pop) * 1000000,
-         indiv_t_hotel = (t_hotel/pop) * 1000000,
-         indiv_t_school = t_school/pop) %>%
-  select(year, indiv_t_grocery, indiv_t_conv, indiv_t_mass, indiv_t_mail, indiv_t_home, indiv_t_rest, indiv_t_hotel, indiv_t_school)
-
-
-```
+indiv_food <- left_join(food, population, by = "year") %>%
+  mutate(indiv_grocery = (grocery_stores/pop) * 1000000,
+         indiv_conv = (convenience_stores/pop) * 1000000,
+         indiv_mass = (mass_merchandisers/pop) * 1000000,
+         indiv_mail = (mail_order_and_home_delivery/pop) * 1000000,
+         indiv_home = (home_production_and_donations/pop) * 1000000,
+         indiv_rest = (full_service_restaurants/pop) * 1000000,
+         indiv_hotel = (hotels_and_motels/pop) * 1000000, 
+         indiv_school = (schools_and_colleges/pop) * 1000000) %>%
+  select(year, indiv_grocery, indiv_conv, indiv_mass, indiv_mail, indiv_home, indiv_rest, indiv_hotel, indiv_school)
+``` 
 
 
 ```{r}
-#Food availability 
+# This chunk of data gathering/cleaning is dedicated to food availability. 
 
-chicken <- read_excel("chicken.xlsx")
+# I gathered the USDA's data on different categories of food availability. 
+# Because they were very strangely formatted when I downloaded the excel files, I did a little bit of cleaning in the excel files themselves before uploading them to R. 
+
+# I uploaded each excel file separately with the desired columns selected from the cleaning I did within the file before joining them.
+
 
 dairy <- read_excel("dairy.xlsx")
 
@@ -75,45 +75,41 @@ fruitveg <- read_excel("fruitveg.xlsx")
 
 grain <- read_excel("grain.xlsx")
 
-nuts <- read_excel("nuts.xlsx") %>%
-  mutate(snack_peanuts = parse_number(snack_peanuts)) %>%
-  mutate(peanut_butter = parse_number(peanut_butter)) %>%
-  mutate(peanut_candy = parse_number(peanut_candy)) %>%
-  mutate(total = parse_number(total))
-
 sweet <- read_excel("sweeteners.xlsx")
 
-red_meat <- read_excel("red_meat.xlsx")
+# There was a ton of data available on the availability of food groups, almost to the point of being overwhelming and hard to narrow down. 
+# I decided to select groups that had variables with both a fresh/frozen component and a processed component. 
+# While this data is far from comprehensive, it provides a glimpse into food availability trends over the past two decades.
 
-x <- left_join(chicken, dairy, by = "year")
+x <- left_join(dairy, fish, by = "year")
 
-y <- left_join(x, fish, by = "year")
+y <- left_join(x, fruitveg, by = "year")
 
-z <- left_join(y, fruitveg, by = "year")
+z <- left_join(y, grain, by = "year")
 
-g <- left_join(z, grain, by = "year")
 
-n <- left_join(g, nuts, by = "year")
-
-r <- left_join(n, red_meat, by = "year")
-
-# Total availability 
-availability <- left_join(r, sweet, by = "year") %>%
-  rename(retail_chicken = retail_availability,
-         total_canned_dairy = total_canned.x,
+availability <- left_join(z, sweet, by = "year") %>%
+  rename(total_canned_dairy = total_canned.x,
          total_frozen_dairy = total_frozen,
          total_fresh_frozen_fish = total_fresh_frozen,
          indiv_fresh_frozen_fish = indiv_fresh_frozen,
          total_canned_fish = total_canned.y,
-         indiv_canned_fish = indiv_canned,
-         total_peanuts = total,
-         retail_meat = total_retail,
-         indiv_meat = indiv_retail)
+         indiv_canned_fish = indiv_canned)
+
+# Joining all of the data left me needing to rename a number of the columns. 
+
+# As with food expenditures, I am interested in per capita measurements. 
+# Luckily the food availability data was already in pounds per capita.
+# I wanted to select variables/categories that could essentially be divided into perishable goods and imperishable goods. 
+# Chicken, red meat, turkey, and other proteins are obviously hugely important portions of this data, especially coming from the USDA. However, the data provided did not have the clear divisions in perishable/imperishable that I was looking for in this instance. 
 
 indiv_availability <- availability %>%
-  select(year, retail_chicken, milk_cream, butter, total_cheese, total_frozen_dairy, total_canned_dairy, total_dry, indiv_fresh_frozen_fish, indiv_canned_fish, indiv_cured, indiv_fish_shell, fresh_fruit, processed_fruit, fresh_veg, processed_veg, total_wheat_flour, oat, rice, total_peanuts, indiv_meat, total_sweeteners, total_flour) %>%
+  select(year, retail_chicken, milk_cream, butter, total_cheese, total_frozen_dairy, total_canned_dairy, total_dry, indiv_fresh_frozen_fish, indiv_canned_fish, indiv_cured, indiv_fish_shell, fresh_fruit, processed_fruit, fresh_veg, processed_veg, total_wheat_flour, oat, rice, indiv_meat, total_sweeteners, total_flour) %>%
   mutate(perishable = milk_cream + butter + total_cheese + fresh_fruit + fresh_veg + indiv_fish_shell + total_wheat_flour) %>%
   mutate(imperishable = total_frozen_dairy + total_canned_dairy + total_dry + indiv_fresh_frozen_fish + indiv_canned_fish + indiv_cured + processed_fruit + processed_veg + total_sweeteners + total_flour)
+
+# I needed categorical variables in order to make my plotting process easier.
+# So, I essentially divided the data by perishable and imperishable so I could add an appropriate categorical variable. 
 
 perishable <- indiv_availability %>%
   select(year, perishable) %>%
@@ -127,92 +123,19 @@ imperishable <- indiv_availability %>%
          total = imperishable) %>%
   select(year, category, total)
 
+# Instead of joining the data, I used bind_rows so I could have the same x and y axes to display two separate lines in my plot. 
+
+
 availability_types <- bind_rows(perishable, imperishable)
 
 ```
 
 
 ```{r}
-#Food expenditure locations
-food <- expenditures %>%
-  select(year, grocery_stores, convenience_stores, mass_merchandisers, mail_order_and_home_delivery, home_production_and_donations, full_service_restaurants, hotels_and_motels, schools_and_colleges)
-
-indiv_food <- left_join(food, population, by = "year") %>%
-  mutate(indiv_grocery = (grocery_stores/pop) * 1000000,
-         indiv_conv = (convenience_stores/pop) * 1000000,
-         indiv_mass = (mass_merchandisers/pop) * 1000000,
-         indiv_mail = (mail_order_and_home_delivery/pop) * 1000000,
-         indiv_home = (home_production_and_donations/pop) * 1000000,
-         indiv_rest = (full_service_restaurants/pop) * 1000000,
-         indiv_hotel = (hotels_and_motels/pop) * 1000000, 
-         indiv_school = (schools_and_colleges/pop) * 1000000) %>%
-  select(year, indiv_grocery, indiv_conv, indiv_mass, indiv_mail, indiv_home, indiv_rest, indiv_hotel, indiv_school)
-
-food_no_taxes_tips <- expenditures_no_taxes_tips %>%
-  select(year, grocery_stores, convenience_stores, mass_merchandisers, mail_order_and_home_delivery, home_production_and_donations, full_service_restaurants, hotels_and_motels, schools_and_colleges)
-
-indiv_food_no_t <- left_join(food_no_taxes_tips, population, by = "year") %>%
-  mutate(indiv_grocery = grocery_stores/pop,
-         indiv_conv = convenience_stores/pop,
-         indiv_mass = mass_merchandisers/pop,
-         indiv_mail = mail_order_and_home_delivery/pop,
-         indiv_home = home_production_and_donations/pop,
-         indiv_rest = full_service_restaurants/pop,
-         indiv_hotel = hotels_and_motels/pop, 
-         indiv_school = schools_and_colleges/pop)
-
-
-```
-
-
-```{r}
-# Join data
-exp_pop <- left_join(expenditures, population, by = "year")
-
-total_indiv <- exp_pop %>%
-  mutate(indiv_fah = (total_fah/pop) * 1000000,
-         indiv_fafh = (total_fafh/pop) * 1000000,
-         total_food = indiv_fafh + indiv_fah,
-         indiv_aah = (total_aah/pop) * 1000000,
-         indiv_aafh = (total_aafh/pop) * 1000000,
-         total_alcohol = indiv_aah + indiv_aafh) %>%
-  select(year, indiv_fah, indiv_fafh, total_food, indiv_aah, indiv_aafh, total_alcohol)
-
-```
-
-
-```{r}
-write_rds(expenditures, path = "final-app/expenditures.rds")
-
-write_rds(expenditures_no_taxes_tips, path = "final-app/expenditures_no_taxes_tips.rds")
-
-write_rds(total_indiv, path = "final-app/total_indiv.rds")
-
-write_rds(food, path = "final-app/food.rds")
-
-write_rds(indiv_tips_taxes, path = "final-app/indiv_tips_taxes.rds")
+# As usual, use write_rds to transfer the data into the app file. 
+# In this case, I originally began with more than two rds files, but later realized that indiv_food and availability_types were the only two necessary. 
 
 write_rds(indiv_food, path = "final-app/indiv_food.rds")
-```
-
-
-```{r}
-write_rds(expenditures, path = "final-app-barplot/expenditures.rds")
-
-write_rds(expenditures_no_taxes_tips, path = "final-app-barplot/expenditures_no_taxes_tips.rds")
-
-write_rds(total_indiv, path = "final-app-barplot/total_indiv.rds")
-
-write_rds(food, path = "final-app-barplot/food.rds")
-
-write_rds(indiv_tips_taxes, path = "final-app-barplot/indiv_tips_taxes.rds")
-
-write_rds(indiv_food, path = "final-app-barplot/indiv_food.rds")
-```
-
-
-```{r}
-write_rds(indiv_availability, path = "final-app/indiv_availability.rds")
 
 write_rds(availability_types, path = "final-app/availability_types.rds")
 ```
