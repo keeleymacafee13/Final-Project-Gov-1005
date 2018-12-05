@@ -131,7 +131,7 @@ $(document).ready(function () {
 
 <pre class="r"><code># I decided to do my data cleaning in an R markdown instead of an R script because it helps me to visually organize each of my data frames, joins, etc. 
 
-# This chunk of data gathering/cleaning is dedicated to food expenditures. 
+# This chunk of code is dedicated to gathering/cleaning data on food expenditures. 
 
 # USDA data on total nominal food and alcohol expenditures by purchasing location in the U.S from: 
 # https://www.ers.usda.gov/data-products/food-expenditure-series/ . 
@@ -171,7 +171,7 @@ indiv_food &lt;- left_join(food, population, by = &quot;year&quot;) %&gt;%
          indiv_hotel = (hotels_and_motels/pop) * 1000000, 
          indiv_school = (schools_and_colleges/pop) * 1000000) %&gt;%
   select(year, indiv_grocery, indiv_conv, indiv_mass, indiv_mail, indiv_home, indiv_rest, indiv_hotel, indiv_school)</code></pre>
-<pre class="r"><code># This chunk of data gathering/cleaning is dedicated to food availability. 
+<pre class="r"><code># This chunk of code is dedicated to gathering/cleaning data on food availability. 
 
 # I gathered the USDA's data on different categories of food availability. 
 # Because they were very strangely formatted when I downloaded the excel files, I did a little bit of cleaning in the excel files themselves before uploading them to R. 
