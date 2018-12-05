@@ -7,8 +7,10 @@ Of course, increased spending over time can be attributed to inflation, tax laws
 My deductions are twofold. First, the USDA data does not account for highly processed goods (soups, frozen dinners, etc.). So, although food availability is going down while expenditure (particularly at convenience stores) is going up in this case, that is likely due to the fact that Americans are relying on and purchasing more heavily processed foods. Second, the way Americans purchase food is changing. Delivery services, like monthly box subscriptions or online orders, are replacing traditional consumer avenues, such as Costco and other mass merchandisers. It seems as though we are moving towards a more processed, more automated food sphere. 
 
 Data sources:
-https://www.ers.usda.gov/data-products/food-expenditure-series/
-https://www.ers.usda.gov/data-products/food-availability-per-capita-data-system/
+https://www.ers.usda.gov/data-products/food-expenditure-series/ 
+
+https://www.ers.usda.gov/data-products/food-availability-per-capita-data-system/ 
+
 https://fred.stlouisfed.org/series/POPTOTUSA647NWDB
 
 Link to my shiny app:
