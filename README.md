@@ -11,6 +11,6 @@ https://www.ers.usda.gov/data-products/food-expenditure-series/
 https://www.ers.usda.gov/data-products/food-availability-per-capita-data-system/
 https://fred.stlouisfed.org/series/POPTOTUSA647NWDB
 
-Link to my shiny:
+Link to my shiny app:
 https://keeley-macafee.shinyapps.io/final-app/
 
