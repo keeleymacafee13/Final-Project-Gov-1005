@@ -104,7 +104,7 @@ availability <- left_join(z, sweet, by = "year") %>%
 # Chicken, red meat, turkey, and other proteins are obviously hugely important portions of this data, especially coming from the USDA. However, the data provided did not have the clear divisions in perishable/imperishable that I was looking for in this instance. 
 
 indiv_availability <- availability %>%
-  select(year, retail_chicken, milk_cream, butter, total_cheese, total_frozen_dairy, total_canned_dairy, total_dry, indiv_fresh_frozen_fish, indiv_canned_fish, indiv_cured, indiv_fish_shell, fresh_fruit, processed_fruit, fresh_veg, processed_veg, total_wheat_flour, oat, rice, indiv_meat, total_sweeteners, total_flour) %>%
+  select(year, milk_cream, butter, total_cheese, total_frozen_dairy, total_canned_dairy, total_dry, indiv_fresh_frozen_fish, indiv_canned_fish, indiv_cured, indiv_fish_shell, fresh_fruit, processed_fruit, fresh_veg, processed_veg, total_wheat_flour, oat, rice, total_sweeteners, total_flour) %>%
   mutate(perishable = milk_cream + butter + total_cheese + fresh_fruit + fresh_veg + indiv_fish_shell + total_wheat_flour) %>%
   mutate(imperishable = total_frozen_dairy + total_canned_dairy + total_dry + indiv_fresh_frozen_fish + indiv_canned_fish + indiv_cured + processed_fruit + processed_veg + total_sweeteners + total_flour)
 
@@ -124,7 +124,6 @@ imperishable <- indiv_availability %>%
   select(year, category, total)
 
 # Instead of joining the data, I used bind_rows so I could have the same x and y axes to display two separate lines in my plot. 
-
 
 availability_types <- bind_rows(perishable, imperishable)
 
