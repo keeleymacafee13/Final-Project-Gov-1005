@@ -1,6 +1,6 @@
 # Final-Project-Gov-1005
 
-The United States is facing a food revolution. Using data from the food expenditure series published by the U.S. Department of Agriculture (USDA), I examine the gap between per capita spending on food and food availability over the past two decades. I use selected food groups (dairy, grains, fish, etc.) and selected retailing locations (grocery stores, convenience stores, etc.) with the hopes that this visualization can be extrapolated out to what is occurring in the food industry more generally.
+The United States is facing a food revolution. Using data from the food expenditure series published by the U.S. Department of Agriculture (USDA), I examine the gap between per capita spending on food and food availability over the past two decades. I use selected food groups (dairy, grains, fish, etc.) and selected retailing locations (grocery stores, convenience stores, etc.) with the hopes that this visualization can be applied to what is occurring in the food industry more generally.
 
 Of course, increased spending over time can be attributed to inflation, tax laws, etc. The purpose of this project is not to examine those causes, but rather to visualize the gap between decreasing food availability and increasing food expenditure. This project also provides a glimpse of which consumer channels are gaining popularity more rapidly and which have plateaued, as new purchasing mechanisms, like eCommerce and meal delivery, have become more accessible to consumers. 
 
