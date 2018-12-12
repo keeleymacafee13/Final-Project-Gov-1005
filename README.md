@@ -1,4 +1,4 @@
-# Final-Project-Gov-1005
+# Food Expenditure and Availability in the United States
 
 The United States is facing a food revolution. Using data from the food expenditure series published by the U.S. Department of Agriculture (USDA), I examine the gap between per capita spending on food and food availability over the past two decades. I use selected food groups (dairy, grains, fish, etc.) and selected retailing locations (grocery stores, convenience stores, etc.) with the hopes that this visualization can be applied to what is occurring in the food industry more generally.
 
